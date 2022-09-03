@@ -1,0 +1,505 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template will be used to provision the networking hub account resources.
+  
+Parameters:
+  AvailabilityZone1:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: "Please select your availability zone for Transit Gateway"
+
+  AvailabilityZone2:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: "Please select second availability zone for Transit Gateway. It should be different from AvailabilityZone1"
+
+  VPCCidr:
+    Type: String
+    Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+    ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  TransitGatewaySubnet1Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  TransitGatewaySubnet2Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  FirewallSubnet1Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  FirewallSubnet2Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  FirewallSubnetpublic1Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  FirewallSubnetpublic2Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  FirewallSubnetmgmt1Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  FirewallSubnetmgmt2Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  NATGatewaySubnet1Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+  NATGatewaySubnet2Cidr:
+   Type: String
+   Description: 'Enter VPC Cidr .For example 10.1.0.0/24 . Make sure it is from the VPC Cidr range and does not overlap with the other provided subnets'
+   ConstraintDescription: 'Check that the provided Cidr is in format a.b.c.d/x'
+
+#Metadata:
+Metadata: 
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "Availability Zones"
+        Parameters: 
+          - AvailabilityZone1
+          - AvailabilityZone2
+
+      - 
+        Label: 
+          default: "VPC Cidr"
+        Parameters: 
+          - VPCCidr
+
+      - 
+        Label: 
+          default: "Transit gateway subnet Cidrs"
+        Parameters: 
+          - TransitGatewaySubnet1Cidr
+          - TransitGatewaySubnet2Cidr
+
+      - 
+        Label: 
+          default: "Firewall subnet Cidrs"
+        Parameters: 
+          - FirewallSubnet1Cidr
+          - FirewallSubnet2Cidr
+          - FirewallSubnetpublic1Cidr
+          - FirewallSubnetpublic2Cidr
+          - FirewallSubnetmgmt1Cidr
+          - FirewallSubnetmgmt2Cidr
+
+      - 
+        Label: 
+          default: "NAT gateway subnet Cidrs"
+        Parameters: 
+          - NATGatewaySubnet1Cidr
+          - NATGatewaySubnet2Cidr
+
+    ParameterLabels: 
+      VPCCidr: 
+        default: "What Cidr range would you like to use for your VPC"
+      
+      AvailabilityZone1: 
+        default: "Select first Availability Zone"
+
+      AvailabilityZone2:  
+        default: "Select another Availability Zone different from the one above"
+
+      TransitGatewaySubnet1Cidr:
+        default: "cidr range for  first transit gateway subnet" 
+
+      TransitGatewaySubnet2Cidr:
+        default: "cidr range for  second transit gateway subnet"
+        
+      FirewallSubnet1Cidr:
+        default: "cidr range for first private firewall subnet"
+
+      FirewallSubnet2Cidr:
+        default: "cidr range for second private firewall subnet"
+
+      FirewallSubnetpublic1Cidr:
+        default: "cidr range for first public firewall subnet"
+
+      FirewallSubnetpublic2Cidr:
+        default: "cidr range for second public firewall subnet"
+
+      FirewallSubnetmgmt1Cidr:
+        default: "cidr range for first management firewall subnet"
+
+      FirewallSubnetmgmt2Cidr:
+        default: "cidr range for second management firewall subnet"
+
+      NATGatewaySubnet1Cidr:
+        default: "cidr range for first NAT gateway subnet"
+
+      NATGatewaySubnet2Cidr:
+        default: "cidr range for second NAT gateway subnet"
+      
+
+#Conditions:
+  
+Resources:
+#First a VPC
+  NetworkingVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: !Ref VPCCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+      - 
+        Key: Name
+        Value: !Sub '${AWS::StackName}-VPC'
+
+
+#Then subnets
+  TransitGatewaySubnet1: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref TransitGatewaySubnet1Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone1
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-TGW-private1'
+
+
+  TransitGatewaySubnet2: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref TransitGatewaySubnet2Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone2
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-TGW-private2'
+
+
+  FirewallSubnet1: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref FirewallSubnet1Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone1
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-Firewall-private1'
+
+  FirewallSubnet2: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref FirewallSubnet2Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone2
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-Firewall-private2'
+
+  FirewallSubnetpublic1: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref FirewallSubnetpublic1Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone1
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-Firewall-public1'
+
+  FirewallSubnetpublic2: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref FirewallSubnetpublic2Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone2
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-Firewall-public2'
+
+  FirewallSubnetmgmt1: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref FirewallSubnetmgmt1Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone1
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-Firewall-mgmt1'
+
+  FirewallSubnetmgmt2: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref FirewallSubnetmgmt2Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone2
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-Firewall-mgmt2'
+
+  NATGatewaySubnet1: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref NATGatewaySubnet1Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone1
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-NAT-public1'
+
+  NATGatewaySubnet2: 
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: !Ref NATGatewaySubnet2Cidr
+      VpcId: !Ref NetworkingVPC
+      AvailabilityZone: !Ref AvailabilityZone2
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-NAT-public2'
+
+  
+  #Internet Gateway and Attachment
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags:
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-IGW'
+      
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref NetworkingVPC
+
+#Elastic IPs
+  NATGatewayEIP1:
+    Type: AWS::EC2::EIP
+    Properties: 
+      Domain: vpc
+      Tags: 
+        - 
+          Key: Name 
+          Value: !Sub '${AWS::StackName}-EIP1'
+    DependsOn: InternetGateway
+      
+
+  NATGatewayEIP2:
+    Type: AWS::EC2::EIP
+    Properties: 
+      Domain: vpc
+      Tags: 
+        - 
+          Key: Name 
+          Value: !Sub '${AWS::StackName}-EIP2'
+    DependsOn: InternetGateway
+
+
+#NAT gateways
+  
+  NATGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATGatewayEIP1.AllocationId 
+      ConnectivityType: public
+      SubnetId: !Ref NATGatewaySubnet1
+      Tags: 
+        -
+          Key: Name 
+          Value: !Sub '${AWS::StackName}-NATGW1'
+      
+
+  NATGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NATGatewayEIP2.AllocationId
+      ConnectivityType: public
+      SubnetId: !Ref NATGatewaySubnet2
+      Tags: 
+        -
+          Key: Name 
+          Value: !Sub '${AWS::StackName}-NATGW2'
+
+  
+
+
+#Route Tables 
+
+  TransitGatewaySubnet1RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-TransitGatewayRT1'
+
+  TransitGatewaySubnet2RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-TransitGatewayRT2'
+  
+  FirewallSubnet1RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-FirewallRT1'
+
+  FirewallSubnet2RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-FirewallRT2'
+
+  FirewallSubnetpublic1RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-FirewallpublicRT1'
+
+  FirewallSubnetpublic2RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-FirewallpublicRT2'
+
+  FirewallSubnetmgmt1RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-FirewallmgmtRT1'
+
+  FirewallSubnetmgmt2RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-FirewallmgmtRT2'
+
+
+
+  NATGatewaySubnet1RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-NATGatewayRT1'
+
+  NATGatewaySubnet2RT:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref NetworkingVPC
+      Tags: 
+        - 
+          Key: Name
+          Value: !Sub '${AWS::StackName}-NATGatewayRT2'
+
+
+#Route Table Associations
+
+  TransitGatewaySubnet1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref TransitGatewaySubnet1RT
+      SubnetId: !Ref TransitGatewaySubnet1
+
+  TransitGatewaySubnet2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref TransitGatewaySubnet2RT
+      SubnetId: !Ref TransitGatewaySubnet2
+
+  FirewallSubnet1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref FirewallSubnet1RT
+      SubnetId: !Ref FirewallSubnet1
+
+  FirewallSubnet2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref FirewallSubnet2RT
+      SubnetId: !Ref FirewallSubnet2
+
+  FirewallSubnetpublic1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref FirewallSubnetpublic1RT
+      SubnetId: !Ref FirewallSubnetpublic1
+
+  FirewallSubnetpublic2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref FirewallSubnetpublic2RT
+      SubnetId: !Ref FirewallSubnetpublic2
+  
+  FirewallSubnetmgmt1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref FirewallSubnetmgmt1RT
+      SubnetId: !Ref FirewallSubnetmgmt1
+
+  FirewallSubnetmgmt2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref FirewallSubnetmgmt2RT
+      SubnetId: !Ref FirewallSubnetmgmt2
+
+  NATGatewaySubnet1RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref NATGatewaySubnet1RT
+      SubnetId: !Ref NATGatewaySubnet1
+
+  NATGatewaySubnet2RTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref NATGatewaySubnet2RT
+      SubnetId: !Ref NATGatewaySubnet2
+
+
